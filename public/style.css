@@ -1,0 +1,12 @@
+
+
+body > #app > .el-container {
+    margin-top:40px;
+}
+
+.el-container {
+    display: flex;
+    justify-content: space-around;
+
+}
+

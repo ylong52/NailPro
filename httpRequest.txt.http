@@ -1,0 +1,22 @@
+### GET request with a header
+GET http://127.0.0.1:9010
+Accept: application/json
+
+### Send POST request with json body
+POST http://127.0.0.1:9010/user/reguser
+Content-Type: application/json
+
+{
+  "mobile_phone": "13972647004",
+  "realname": "xxx",
+  "desc": ""
+}
+
+### GET request with a header
+GET http://127.0.0.1:9010/userinfo/lxkfuoh6e28b
+Accept: application/json
+
+
+### Send POST request with json body
+POST http://127.0.0.1:9010/user/info/lxkfuoh6e28b
+

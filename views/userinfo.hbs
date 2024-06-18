@@ -1,0 +1,41 @@
+<!--<h2>欢迎来到我们的网站！</h2>-->
+<!--<p>这是一个使用Handlebars模板引擎的Express应用程序。</p>-->
+
+<div id="app">
+    <{userInfo}>
+</div>
+
+<script src="/vue2.6.11.js"></script>
+<script src="/element-ui.js"></script>
+<script src="/jquery-1.9.1.min.js"></script>
+
+<script>
+    new Vue({
+        el: '#app',
+        delimiters: ['<{', '}>'],  //分隔符
+        data: function() {
+            return {
+                userInfo: {},
+                title:'xxxxxxxxxxx'
+            }
+        },
+        methods: {
+            getInfo() {
+                let _self = this;
+                $.ajax({
+                    type: "POST",
+                    url: "/user/info/{{{uuid}}}",
+                    contentType: "application/json",
+                    success: function(data){
+                        console.log(data.data.userinfo);
+                        _self.userInfo = data.data.userinfo;
+                    }
+                });
+
+            }
+        },
+        mounted() {
+            this.getInfo();
+        }
+    })
+</script>
