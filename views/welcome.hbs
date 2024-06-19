@@ -40,7 +40,7 @@
                 rules: {
                     realname: [
                         { required: true, message: '请输入姓名', trigger: 'blur' },
-                        { min: 3, max: 5, message: '长度在 2 到 8 个字', trigger: 'blur' }
+                        { min: 2, max:10, message: '长度在 2 到 10 个字', trigger: 'blur' }
                     ],
                     mobile_phone: [
                         { required: true, message: '手机号必输', trigger: 'change' }
@@ -61,9 +61,12 @@
                             contentType: "application/json",
                             data: JSON.stringify(this.ruleForm),
                             success: function(data){
-                                console.log(data);
+
                                 if (data.code==0 && data.data?.uuid) {
+                                    console.log(data);
                                     window.location.href = "/userinfo/"+data.data.uuid;
+                                    debugger
+                                    return false;
                                 }
 
                             }

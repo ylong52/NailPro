@@ -83,7 +83,9 @@ exports.regUser = (req, res) => {
       let sqlStr = "INSERT INTO users (`mobile_phone`,`realname`,`desc`,`uuid`,`created_at`) VALUES (?,?,?,?,?)";
       db.query(sqlStr,[userinfo.mobile_phone, userinfo.realname, userinfo.desc,uuid,created_at],(err, results) => {
         if (err) {
-          return reject(err);
+          console.log(err);
+          resolve(-1);
+
         }
         // 插入成功后，resolve 方法可以返回新插入记录的 ID
         resolve(uuid);
@@ -101,10 +103,8 @@ exports.regUser = (req, res) => {
       if (isNumeric) {
         userId = userIdRet.user_id;
         if (userId==0) {
-            return saveUser(userinfo).then((id,uuid)=>{
-                //保存完成
-                return uuid
-            })
+          return await saveUser(userinfo)
+
         } else {
           return userIdRet.uuid;
         }
@@ -115,18 +115,29 @@ exports.regUser = (req, res) => {
       console.log('用户ID:', userId);
     } catch (err) {
       console.log('查询错误:', err);
+      return -1;
     }
   };
 
   storeUserData(userinfo).then(uuid=>{
-    res.send({
-      status: 200,
-      message: "注册成功",
-      code: 0,
-      data:{
-        uuid:uuid
-      }
-    });
+    if (uuid.length==12) {
+      res.send({
+        status: 200,
+        message: "注册成功",
+        code: 0,
+        data:{
+          uuid:uuid
+        }
+      });
+    } else {
+      res.send({
+        status: 200,
+        message: "注册失败",
+        code: 0,
+        data:{}
+      });
+    }
+
   })
 
 }
