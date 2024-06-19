@@ -3,12 +3,21 @@
 
 <div id="app">
     <{userInfo}>
+    <div id="currentURL"><{currentURL}></div>
+    <el-button class="btn" data-clipboard-target="#currentURL"   >复制</el-button>
+
 </div>
 
 <script src="/vue2.6.11.js"></script>
 <script src="/element-ui.js"></script>
 <script src="/jquery-1.9.1.min.js"></script>
-
+<script src="/clipboard.min.js"></script>
+<script>
+    var clipboard = new ClipboardJS('.btn');
+    clipboard.on('success', function (e) {
+        console.info('copy url:', e.text);
+    });
+</script>
 <script>
     new Vue({
         el: '#app',
@@ -16,7 +25,8 @@
         data: function() {
             return {
                 userInfo: {},
-                title:'xxxxxxxxxxx'
+                title:'xxxxxxxxxxx',
+                currentURL:''
             }
         },
         methods: {
@@ -26,16 +36,17 @@
                     type: "POST",
                     url: "/user/info/{{{uuid}}}",
                     contentType: "application/json",
-                    success: function(data){
+                    success: function (data) {
                         console.log(data.data.userinfo);
                         _self.userInfo = data.data.userinfo;
                     }
                 });
-
             }
+
         },
         mounted() {
             this.getInfo();
+            this.currentURL = window.location.href;
         }
     })
 </script>
