@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-
+const multer = require('multer');
 // 导入用户路由处理函数对应的模块
 const user_handler = require("../router_handler/user");
 
@@ -9,9 +9,19 @@ const expressJoi = require("@escook/express-joi");
 // 2. 导入需要的验证规则对象
 // const { reg_login_schema,update_avatar_imgtextsave } = require("../schema/user");
 
-// 注册新用户
+// 设置multer存储配置
+// const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         cb(null, 'uploads/'); // 指定存储目录
+//     },
+//     filename: function (req, file, cb) {
+//         cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+//     }
+// });
+// const upload = multer({ storage: storage });
 router.post("/reguser",   user_handler.regUser);
-router.post("/info/:uuid", user_handler.userInfo);
+router.post("/info/:uuid",user_handler.userInfo);
+router.post("/uploads",user_handler.uploads);
 // // 登录
 // router.post("/login", expressJoi(reg_login_schema), user_handler.login);
 // // 获取验证码

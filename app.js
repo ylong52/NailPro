@@ -2,6 +2,7 @@
 const express = require("express");
 // 创建服务器的实例对象
 const app = express();
+const path = require('path');
 
 const handlebars = require("express-handlebars");
 // app.engine("handlebars", handlebars.engine({ defaultLayout: "layout" }));
@@ -22,6 +23,10 @@ app.get("/", (req, res) => {
   res.render("welcome", { title: "欢迎" });
 });
 
+// 设置uploads目录为静态目录
+const uploadsPath = path.join(__dirname, 'uploads');
+app.use('/uploads', express.static(uploadsPath));
+
 app.get("/userinfo/:uuid", (req, res) => {
   res.render("userinfo", { uuid: req.params.uuid });
 });
@@ -31,7 +36,7 @@ app.get("/userinfo/:uuid", (req, res) => {
 app.use("/user", require("./router/user") );
 // app.use("/user", require("./router/user") );
 
-// app.use("/user", require("./router/user") );
+
 
 
 // // 添加用户注册的POST路由

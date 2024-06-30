@@ -11,33 +11,11 @@ const http = require("http");
 // 处理get请求参数
 const querystring = require("querystring");
 const crypto = require('crypto');
-// // 获取用户验证码
-// exports.mobilevcode = (req, res) => {
-//   // 获取验证码
-//   const getlogin = {
-//     hostname: config.urlzg,
-//     path:
-//       "/api/v2/mobile/vcode?" + querystring.stringify({ phone: "15220730439" }),
-//     method: "GET",
-//     headers: {
-//       "Content-Type": "application/json; charset=utf-8",
-//     },
-//   };
-//
-//   const getloginresult = http.request(getlogin, (res) => {
-//     // console.log("结果-验证码", res);
-//   });
-//
-//   getloginresult.on("error", (e) => {
-//     console.error(`请求失败: ${e.message}`);
-//   });
-//
-//   res.send({
-//     status: 200,
-//     message: "获取验证码成功",
-//     code: "",
-//   });
-// };
+const path = require("path");
+const multer = require('multer');
+const formidable = require('formidable');
+const {de} = require("yarn/lib/cli");
+const fs = require('fs').promises;
 
 function generateUniqueCode() {
   // 获取当前时间戳
@@ -65,49 +43,82 @@ exports.regUser = (req, res) => {
         if (err) {
           return reject(err);
         }
-        if (results.length > 0) {
-           resolve(results[0]);
+        if (results.length>0) {
+           resolve({'userInfo':results[0]});
         } else {
-          resolve({'user_id':0});
+           userInfo = {}
+           userInfo.user_id = 0
+           resolve({'userInfo':userInfo});
         }
+
+
       });
     });
   };
 
   const saveUser = (userinfo) => {
+    files = []
+    for (const fileElement of userinfo.fileList) {
+       files.push('\\'+fileElement['response'][0].path)
+    }
+    strfiles = files.join(";")
     return new Promise((resolve, reject) => {
+      if (userinfo.id==0) {
+        const uuid = generateUniqueCode();
+        const created_at = new Date().toLocaleString();
+        // 加密密码
+        let sqlStr = "INSERT INTO users (`mobile_phone`,`realname`,`desc`,`images`,`weixing`,`uuid`,`created_at`) VALUES (?,?,?,?,?,?,?)";
+        db.query(sqlStr, [userinfo.mobile_phone, userinfo.realname, userinfo.desc, strfiles,userinfo.weixing, uuid, created_at], (err, results) => {
+          if (err) {
+            console.log(err);
+            resolve(-1);
+          }
+          // 插入成功后，resolve 方法可以返回新插入记录的 ID
+          resolve(uuid);
+        });
+      } else {
 
-      const uuid = generateUniqueCode();
-      const created_at = new Date().toLocaleString();
-      // 加密密码
-      let sqlStr = "INSERT INTO users (`mobile_phone`,`realname`,`desc`,`uuid`,`created_at`) VALUES (?,?,?,?,?)";
-      db.query(sqlStr,[userinfo.mobile_phone, userinfo.realname, userinfo.desc,uuid,created_at],(err, results) => {
-        if (err) {
-          console.log(err);
-          resolve(-1);
+        let sqlStr = "UPDATE `users` SET `realname`=?, `desc`=?,`images`=?,`weixing`=? WHERE  `user_id`=?";
+        db.query(sqlStr, [userinfo.realname, userinfo.desc, strfiles, userinfo.weixing, userinfo.id], (err, results) => {
+          if (err) {
+            console.log(err);
+            resolve(-1);
+          }
+          // 插入成功后，resolve 方法可以返回新插入记录的 ID
+          resolve(userinfo.uuid);
+        });
 
-        }
-        // 插入成功后，resolve 方法可以返回新插入记录的 ID
-        resolve(uuid);
-      });
+      }
 
     });
   };
 
-
   const storeUserData = async (userinfo) => {
     let userId = 0
+    const userRet = await getUserInfo(userinfo);
+    const isNumeric = /^\d+$/.test(userRet.userInfo.user_id);
     try {
-      const userIdRet = await getUserInfo(userinfo);
-      const isNumeric = /^\d+$/.test(userIdRet.user_id);
-      if (isNumeric) {
-        userId = userIdRet.user_id;
-        if (userId==0) {
-          return await saveUser(userinfo)
 
+      if (isNumeric) {
+        userinfo.id = userRet.userInfo.user_id;
+        userinfo.uuid = userRet.userInfo.uuid;
+        if (userinfo.id>0) {
+            userinfo.weixing = userRet.userInfo.weixing;
+            userinfo.desc = userRet.userInfo.desc;
         } else {
-          return userIdRet.uuid;
+          userinfo.weixing = userinfo.weixing;
+          userinfo.desc = userinfo.desc;
         }
+
+
+        return await saveUser(userinfo)
+        // if (userId==0) {
+        //   return await saveUser(userinfo)
+        //
+        // } else {
+        //   return userIdRet.uuid;
+        // }
+
       } else {
          console.log("用户ID是一个非数字字符串:", userId);
          throw new Error("系统错误")
@@ -118,6 +129,8 @@ exports.regUser = (req, res) => {
       return -1;
     }
   };
+
+
 
   storeUserData(userinfo).then(uuid=>{
     if (uuid.length==12) {
@@ -176,3 +189,44 @@ exports.userInfo = (req, res) => {
 
 }
 
+
+// 设置multer存储配置
+const storage = multer.diskStorage({
+  destination: async function (req, file, cb) {
+    try {
+      const currentDate = new Date().toISOString().split('T')[0];
+      await fs.mkdir(path.join('uploads', currentDate), { recursive: true });
+      cb(null, path.join('uploads',currentDate)); // 指定存储目录
+    } catch (error) {
+      cb(error);
+    }
+  },
+  filename: function (req, file, cb) {
+    cb(null,  Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
+
+//上传文件
+exports.uploads = (req, res) => {
+  // debugger;
+  upload.array('file', 10)(req, res, function(err) {
+    if (err instanceof multer.MulterError) {
+      // 处理multer错误
+      return res.status(500).send(err);
+    } else if (err) {
+      // 处理其他错误
+      return res.status(500).send(err);
+    }
+
+
+    const files = req.files;
+    console.log('Files:', files);
+    // 这里可以处理文件和表单数据，例如保存到数据库
+    res.send(files);
+
+  });
+
+
+}

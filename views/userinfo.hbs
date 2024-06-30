@@ -2,31 +2,70 @@
 <!--<p>这是一个使用Handlebars模板引擎的Express应用程序。</p>-->
 
 <div id="app">
-    <{userInfo}>
-    <div id="currentURL"><{currentURL}></div>
-    <el-button class="btn" data-clipboard-target="#currentURL"   >复制</el-button>
+
+    <div style="margin-top:2rem;">
+        <div style="padding:0 1rem;">
+            <h1 style="font-family: ui-monospace;">Hello! <{userInfo.realname}>
+                <span style='font-size:70px;'>&#128075;</span> </h1>
+            <el-carousel :interval="4000"   height="20rem">
+                <el-carousel-item v-for="image in images" :key="image">
+                    <el-image :src="image" fit="contain" ></el-image>
+                </el-carousel-item>
+            </el-carousel>
+        </div>
+
+        <div class="infoblock" style="padding:1rem 2rem;">
+            <p><span>手机号:</span> <{userInfo.mobile_phone}></p>
+            <p><span>微信号:</span> <{userInfo.weixing}></p>
+            <p><span>说几句:</span> <{userInfo.desc}></p>
+        </div>
+
+        <div id="currentURL" style="position: absolute;left: -1000px;" ><{currentURL}></div>
+        <div style="display: flex;margin:0 2rem;margin-bottom: 2rem; ">
+            <div id="qrcode"> </div>
+            <div>
+                <el-button type="danger" @click="openNewPage" round class="share" style="margin-left: 1rem;" >小红书</el-button>
+
+                <el-button round class="share btn" type="info" data-clipboard-target="#currentURL"  style="background-color:#000000;margin-left: 1rem;margin-top: 1rem;" >分享</el-button>
+            </div>
+        </div>
+
+
+     </div>
 
 </div>
 
+<style>
+
+    .infoblock>p>span {
+        font-weight: 600;
+    }
+
+    .share {
+        margin: 0  auto;
+        display: block;
+        font-size: 1.2rem;
+        height:3rem;
+        width: 10rem;
+    }
+
+</style>
 <script src="/vue2.6.11.js"></script>
 <script src="/element-ui.js"></script>
 <script src="/jquery-1.9.1.min.js"></script>
 <script src="/clipboard.min.js"></script>
+<script src="/qrcode.js"></script>
+
 <script>
-    var clipboard = new ClipboardJS('.btn');
-    clipboard.on('success', function (e) {
-        console.info('copy url:', e.text);
-    });
-</script>
-<script>
-    new Vue({
+    vm = new Vue({
         el: '#app',
         delimiters: ['<{', '}>'],  //分隔符
         data: function() {
             return {
                 userInfo: {},
-                title:'xxxxxxxxxxx',
-                currentURL:''
+                title:'',
+                currentURL:'',
+                images:[]
             }
         },
         methods: {
@@ -37,16 +76,42 @@
                     url: "/user/info/{{{uuid}}}",
                     contentType: "application/json",
                     success: function (data) {
-                        console.log(data.data.userinfo);
+                        // console.log(data.data.userinfo);
                         _self.userInfo = data.data.userinfo;
+                        _self.images = _self.userInfo.images.split(";")
+                        console.log(_self.images);
                     }
                 });
+            },
+            createQrcode() {
+                    new QRCode(document.getElementById("qrcode"), {
+                    text: window.location.href,
+                    width: 128,
+                    height: 128,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                })
+            },
+            openNewPage() {
+                url = "https://www.xiaohongshu.com/explore";
+                window.open(url, '_blank');
             }
-
         },
         mounted() {
             this.getInfo();
+            this.createQrcode();
             this.currentURL = window.location.href;
         }
     })
+</script>
+<script>
+    var clipboard = new ClipboardJS('.btn');
+    clipboard.on('success', function (e) {
+        console.info('copy url:', e.text);
+        vm.$notify.info({
+            title: '消息',
+            message: '请将使用粘贴分享给您的朋友哟'
+        });
+    });
 </script>
