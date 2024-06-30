@@ -1,0 +1,12 @@
+{
+  "apps": [
+    {
+      "name": "NailPro",
+      "script": "node app.js",
+      "cwd":"./",
+      "instances": 1,
+      "log_date_format": "YYYY-MM-DD HH:mm Z",
+      "max_memory_restart": "500M"
+    }
+  ]
+}
