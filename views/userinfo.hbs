@@ -1,12 +1,12 @@
 <!--<h2>欢迎来到我们的网站！</h2>-->
 <!--<p>这是一个使用Handlebars模板引擎的Express应用程序。</p>-->
 
-<div id="app">
+<div id="app" v-show="appshow">
 
     <div style="margin-top:2rem;">
         <div style="padding:0 1rem;">
-            <h1 style="font-family: ui-monospace;">Hello! <{userInfo.realname}>
-                <span style='font-size:70px;'>&#128075;</span> </h1>
+            <h1 style="font-family: ui-monospace;"><span style='font-size:70px;'>&#128075;</span><{website}>
+                 </h1>
             <el-carousel :interval="4000"   height="20rem">
                 <el-carousel-item v-for="image in images" :key="image">
                     <el-image :src="image" fit="contain" ></el-image>
@@ -15,9 +15,10 @@
         </div>
 
         <div class="infoblock" style="padding:1rem 2rem;">
+            <p><span>名称:</span> <{userInfo.realname}></p>
             <p><span>手机号:</span> <{userInfo.mobile_phone}></p>
             <p><span>微信号:</span> <{userInfo.weixing}></p>
-            <p><span>说几句:</span> <{userInfo.desc}></p>
+            <p><span>我的留言:</span> <{userInfo.desc}></p>
         </div>
 
         <div id="currentURL" style="position: absolute;left: -1000px;" ><{currentURL}></div>
@@ -29,7 +30,6 @@
                 <el-button round class="share btn" type="info" data-clipboard-target="#currentURL"  style="background-color:#000000;margin-left: 1rem;margin-top: 1rem;" >分享</el-button>
             </div>
         </div>
-
 
      </div>
 
@@ -65,7 +65,9 @@
                 userInfo: {},
                 title:'',
                 currentURL:'',
-                images:[]
+                images:[],
+                website:'',
+                appshow:false,
             }
         },
         methods: {
@@ -76,10 +78,14 @@
                     url: "/user/info/{{{uuid}}}",
                     contentType: "application/json",
                     success: function (data) {
-                        // console.log(data.data.userinfo);
+                        _self.appshow = true;
                         _self.userInfo = data.data.userinfo;
                         _self.images = _self.userInfo.images.split(";")
-                        console.log(_self.images);
+                        if (data.data.userinfo.webtitle) {
+                            _self.website = data.data.userinfo.webtitle
+                        } else {
+                            _self.website = data.data.userinfo.realname
+                        }
                     }
                 });
             },
@@ -94,12 +100,18 @@
                 })
             },
             openNewPage() {
-                url = "https://www.xiaohongshu.com/explore";
+                if (this.userInfo.xiaohongshu) {
+                    url = this.userInfo.xiaohongshu;
+                } else {
+                    url = "https://www.xiaohongshu.com/explore";
+                }
+
                 window.open(url, '_blank');
             }
         },
         mounted() {
             this.getInfo();
+
             this.createQrcode();
             this.currentURL = window.location.href;
         }

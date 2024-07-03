@@ -230,3 +230,35 @@ exports.uploads = (req, res) => {
 
 
 }
+
+
+//取用户信息
+exports.getuserbymobile = (req, res) => {
+  mobile = req.body.mobile_phone;
+  const getuserbymobile = (mobile) => {
+    return new Promise((resolve, reject) => {
+      let sqlStr = "SELECT * FROM  `users`  where mobile_phone = ?"
+      db.query(sqlStr, mobile, (err, results) => {
+        if (err) {
+          console.log(err);
+          resolve(-1);
+        }
+        // 插入成功后，resolve 方法可以返回新插入记录的 ID
+        resolve(results[0]);
+      });
+    })
+  }
+   
+
+  getuserbymobile(mobile).then(r =>{
+    res.send({
+      status: 200,
+      message: "获取用户信息成功",
+      code: 0,
+      data: {"userinfo":r}
+    });
+
+  })
+
+
+}

@@ -31,6 +31,8 @@ app.get("/userinfo/:uuid", (req, res) => {
   res.render("userinfo", { uuid: req.params.uuid });
 });
 
+
+
 // 导入并使用用户路由模块
 // const userRouter = require("./router/user");
 app.use("/user", require("./router/user") );

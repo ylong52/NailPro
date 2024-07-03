@@ -22,6 +22,7 @@ const expressJoi = require("@escook/express-joi");
 router.post("/reguser",   user_handler.regUser);
 router.post("/info/:uuid",user_handler.userInfo);
 router.post("/uploads",user_handler.uploads);
+router.post("/getuserbymobile",user_handler.getuserbymobile);
 // // 登录
 // router.post("/login", expressJoi(reg_login_schema), user_handler.login);
 // // 获取验证码
