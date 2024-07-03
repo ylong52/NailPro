@@ -69,7 +69,7 @@
                 </el-form-item>
 
                 <el-form-item>
-                    <el-button v-if="ruleForm.mobile_phone" @click="submitForm('ruleForm')">
+                    <el-button  type="primary"  @click="submitForm('ruleForm')">
                         保存及预览
                     </el-button>
                     <el-button @click="resetForm('ruleForm')">
@@ -201,6 +201,13 @@
         },
         methods: {
             submitForm(formName) {
+                if (!this.ruleForm.mobile_phone) {
+                    return this.$notify.info({
+                        title: '提示',
+                        message: '请输入内容'
+                    });
+
+                }
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         if (this.fileList.length == 0) {
