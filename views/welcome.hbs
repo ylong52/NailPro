@@ -13,9 +13,11 @@
 <div id="app">
     <div  v-show="editVisible">
         <el-container>
-            <h1 style="font-family: ui-monospace;font-size: 1.2rem;margin-left: 0rem;"><span style='font-size:2.8rem;'>&#128070;</span>欢迎来到fingerella指尖魔法</h1>
+            <h1 style="font-size: 1.0rem;margin-left: 0rem;">
+			<span style='font-size:1.4rem;'>&#128070;</span>
+			欢迎来到fingerella指尖魔法</h1>
 
-            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm" style=" ">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm"  class="demo-ruleForm"  >
 
 
                 <el-row>
@@ -34,7 +36,7 @@
                 </el-row>
 
                 <el-row>
-                    <lable prop="weixing">微信<em>*</em></lable>
+                    <lable prop="weixing">微信</lable>
                     <el-input v-model="ruleForm.weixing" placeholder="微信"></el-input>
                 </el-row>
 
@@ -147,6 +149,7 @@
 		font-weight: bolder;
 		display: block;
 		margin: 1rem 0;
+		font-size:0.8rem;
 	}
 
     .el-form-item__content {
@@ -174,8 +177,9 @@
     }
 	
 	.el-input__inner {
-	 
-	}
+    height: 3rem;
+    line-height: 1rem;
+}
 </style>
 <script>
     new Vue({
@@ -195,7 +199,7 @@
                 ruleForm: {
                     webtitle: '',
                     realname: '',
-                    mobile_phone: '13972647001',
+                    mobile_phone: '',
                     weixing: '',
                     xiaohongshu: '',
                     desc: '',
