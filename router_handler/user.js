@@ -67,8 +67,8 @@ exports.regUser = (req, res) => {
         const uuid = generateUniqueCode();
         const created_at = new Date().toLocaleString();
         // 加密密码
-        let sqlStr = "INSERT INTO users (`mobile_phone`,`realname`,`desc`,`images`,`weixing`,`uuid`,`created_at`) VALUES (?,?,?,?,?,?,?)";
-        db.query(sqlStr, [userinfo.mobile_phone, userinfo.realname, userinfo.desc, strfiles,userinfo.weixing, uuid, created_at], (err, results) => {
+        let sqlStr = "INSERT INTO users (`webtitle`,`mobile_phone`,`realname`,`desc`,`images`,`weixing`,`xiaohongshu`,uuid`,`created_at`) VALUES (?,?,?,?,?,?,?)";
+        db.query(sqlStr, [userinfo.webtitle,userinfo.mobile_phone, userinfo.realname, userinfo.desc, strfiles,userinfo.weixing,userinfo.xiaohongshu, uuid, created_at], (err, results) => {
           if (err) {
             console.log(err);
             resolve(-1);
@@ -78,8 +78,8 @@ exports.regUser = (req, res) => {
         });
       } else {
 
-        let sqlStr = "UPDATE `users` SET `realname`=?, `desc`=?,`images`=?,`weixing`=? WHERE  `user_id`=?";
-        db.query(sqlStr, [userinfo.realname, userinfo.desc, strfiles, userinfo.weixing, userinfo.id], (err, results) => {
+        let sqlStr = "UPDATE `users` SET `webtitle`=?, `realname`=?, `desc`=?,`images`=?,`weixing`=?,`xiaohongshu`=? WHERE  `user_id`=?";
+        db.query(sqlStr, [userinfo.webtitle,userinfo.realname, userinfo.desc, strfiles, userinfo.weixing,userinfo.xiaohongshu, userinfo.id], (err, results) => {
           if (err) {
             console.log(err);
             resolve(-1);
@@ -102,23 +102,15 @@ exports.regUser = (req, res) => {
       if (isNumeric) {
         userinfo.id = userRet.userInfo.user_id;
         userinfo.uuid = userRet.userInfo.uuid;
-        if (userinfo.id>0) {
-            userinfo.weixing = userRet.userInfo.weixing;
-            userinfo.desc = userRet.userInfo.desc;
-        } else {
-          userinfo.weixing = userinfo.weixing;
-          userinfo.desc = userinfo.desc;
-        }
-
-
-        return await saveUser(userinfo)
-        // if (userId==0) {
-        //   return await saveUser(userinfo)
-        //
+        // if (userinfo.id>0) {
+        //     userinfo.weixing = userRet.userInfo.weixing;
+        //     userinfo.desc = userRet.userInfo.desc;
         // } else {
-        //   return userIdRet.uuid;
+        //   // userinfo.weixing = userinfo.weixing;
+        //   // userinfo.desc = userinfo.desc;
         // }
 
+        return await saveUser(userinfo)
       } else {
          console.log("用户ID是一个非数字字符串:", userId);
          throw new Error("系统错误")

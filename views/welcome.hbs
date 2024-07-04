@@ -90,6 +90,7 @@
     </div>
 
     <div v-show="priviewVisible">
+        <h2 class="private_title">预览效果页</h2>
         <div style="padding:0 1rem;">
             <h1 style="font-family: ui-monospace;"><span style='font-size:70px;'>&#128075;</span>
                 <{userInfo.website}>
@@ -102,6 +103,7 @@
         </div>
 
         <div class="infoblock" style="padding:1rem 2rem;">
+            <p><span>姓名:</span> <{userInfo.realname}></p>
             <p><span>手机号:</span> <{userInfo.mobile_phone}></p>
             <p><span>微信号:</span> <{userInfo.weixing}></p>
             <p><span>我的留言:</span> <{userInfo.desc}></p>
@@ -122,7 +124,7 @@
                      发布
             </el-button>
             <el-button v-if="ruleForm.mobile_phone" type="plain"  style="width: 40%;"  @click="switchPriview(true)">
-                关闭
+                返回
             </el-button>
         </div>
     </div>
@@ -180,6 +182,14 @@
     height: 3rem;
     line-height: 1rem;
 }
+    
+    .private_title{
+        background-color: yellow;
+    }
+
+    .infoblock p>span {
+        font-weight: 550;
+    }
 </style>
 <script>
     new Vue({
@@ -204,6 +214,7 @@
                     xiaohongshu: '',
                     desc: '',
                 },
+                notification:'',
                 rules: {
                     realname: [
                         {required: true, message: '请输入姓名', trigger: 'blur'},
@@ -247,9 +258,10 @@
                         setTimeout(function () {
                             _self.btn_disabled = false;
                         }, 3000)
-                        this.$notify.info({
+                        _self.notification = this.$notify.info({
                             title: '消息',
-                            message: '正在提交中...'
+                            message: '正在提交中...',
+                            duration: 0 
                         });
                         $.ajax({
                             type: "POST",
@@ -258,9 +270,7 @@
                             data: JSON.stringify(this.ruleForm),
                             success: function (data) {
                                 if (data.code == 0 && data.data?.uuid) {
-                                    // console.log(data);
-                                    // window.location.href = "/userinfo/" + data.data.uuid;
-                                    // return false;
+                                    _self.notification.close();
                                     _self.uuid = data.data.uuid;
                                     _self.getuserbymobile();
 
