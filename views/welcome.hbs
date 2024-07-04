@@ -220,8 +220,12 @@
                 },
                 notification:'',
                 rules: {
-                    webtitle:[                       
-                        { pattern: /^[0-9a-zA-Z-_]+$/, message: '字符串只能包含数字和英文字母', trigger: ['blur', 'change'] }
+                    webtitle:[
+                        {
+                            pattern: /^[0-9a-zA-Z_-\u4e00-\u9fa5]+$/,
+                            message: '字符串只能包含中文、数字和英文字母',
+                            trigger: ['blur', 'change']
+                        }
                     ],
                     realname: [
                         {required: true, message: '请输入姓名', trigger: ['blur', 'change', 'submit']},
