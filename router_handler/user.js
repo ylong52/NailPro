@@ -59,23 +59,28 @@ exports.regUser = (req, res) => {
   const saveUser = (userinfo) => {
     files = []
     for (const fileElement of userinfo.fileList) {
-       files.push('\\'+fileElement['response'][0].path)
+       files.push( fileElement['response'][0].path)
     }
     strfiles = files.join(";")
     return new Promise((resolve, reject) => {
       if (userinfo.id==0) {
         const uuid = generateUniqueCode();
         const created_at = new Date().toLocaleString();
-        // 加密密码
-        let sqlStr = "INSERT INTO users (`webtitle`,`mobile_phone`,`realname`,`desc`,`images`,`weixing`,`xiaohongshu`,uuid`,`created_at`) VALUES (?,?,?,?,?,?,?)";
-        db.query(sqlStr, [userinfo.webtitle,userinfo.mobile_phone, userinfo.realname, userinfo.desc, strfiles,userinfo.weixing,userinfo.xiaohongshu, uuid, created_at], (err, results) => {
-          if (err) {
-            console.log(err);
-            resolve(-1);
-          }
-          // 插入成功后，resolve 方法可以返回新插入记录的 ID
-          resolve(uuid);
-        });
+        try {
+          let sqlStr = "INSERT INTO users (`webtitle`,`mobile_phone`,`realname`,`desc`,`images`,`weixing`,`xiaohongshu`,`uuid`,`created_at`) VALUES (?,?,?,?,?,?,?,?,?)";
+          db.query(sqlStr, [userinfo.webtitle,userinfo.mobile_phone, userinfo.realname, userinfo.desc, strfiles,userinfo.weixing,userinfo.xiaohongshu, uuid, created_at], (err, results) => {
+            if (err) {
+              console.log(err);
+              resolve(-1);
+            }
+            // 插入成功后，resolve 方法可以返回新插入记录的 ID
+            resolve(uuid);
+          });
+        }catch (err) {
+          console.log('插入数据错误:', err);
+          resolve(-1);
+        }
+
       } else {
 
         let sqlStr = "UPDATE `users` SET `webtitle`=?, `realname`=?, `desc`=?,`images`=?,`weixing`=?,`xiaohongshu`=? WHERE  `user_id`=?";
@@ -214,8 +219,8 @@ exports.uploads = (req, res) => {
 
 
     const files = req.files;
+    files[0].path = "\\" + files[0].path ;
     console.log('Files:', files);
-    // 这里可以处理文件和表单数据，例如保存到数据库
     res.send(files);
 
   });

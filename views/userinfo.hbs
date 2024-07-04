@@ -25,7 +25,13 @@
         <div style="display: flex;margin:0 2rem;margin-bottom: 2rem; ">
             <div id="qrcode"> </div>
             <div>
-                <el-button type="danger" @click="openNewPage" round class="share" style="margin-left: 1rem;" >小红书</el-button>
+
+                <el-button type="danger" v-if="!xiaohongshu" disabled round class="share" style="margin-left: 1rem;">
+                    小红书
+                </el-button>
+                <el-button type="danger" v-else @click="openNewPage" round class="share" style="margin-left: 1rem;">
+                    小红书
+                </el-button>
 
                 <el-button round class="share btn" type="info" data-clipboard-target="#currentURL"  style="background-color:#000000;margin-left: 1rem;margin-top: 1rem;" >分享</el-button>
             </div>
@@ -68,6 +74,7 @@
                 images:[],
                 website:'',
                 appshow:false,
+                xiaohongshu:'',
             }
         },
         methods: {
@@ -86,6 +93,11 @@
                         } else {
                             _self.website = data.data.userinfo.realname
                         }
+                        if (data.data.userinfo.xiaohongshu) {
+                            _self.xiaohongshu = 'https://www.xiaohongshu.com/user/profile/'+data.data.userinfo.xiaohongshu
+                        } else {
+                            _self.xiaohongshu = ''
+                        }
                     }
                 });
             },
@@ -100,13 +112,7 @@
                 })
             },
             openNewPage() {
-                if (this.userInfo.xiaohongshu) {
-                    url = this.userInfo.xiaohongshu;
-                } else {
-                    url = "https://www.xiaohongshu.com/explore";
-                }
-
-                window.open(url, '_blank');
+                window.open(this.xiaohongshu, '_blank');
             }
         },
         mounted() {
