@@ -130,6 +130,15 @@ exports.regUser = (req, res) => {
 
 
   storeUserData(userinfo).then(uuid=>{
+    if (uuid==-1) {
+        return res.send({
+        status: 200,
+        message: "注册失败",
+        code: -1,
+        data:{}
+      });
+        
+    }
     if (uuid.length==12) {
       res.send({
         status: 200,
@@ -143,7 +152,7 @@ exports.regUser = (req, res) => {
       res.send({
         status: 200,
         message: "注册失败",
-        code: 0,
+        code: -1,
         data:{}
       });
     }

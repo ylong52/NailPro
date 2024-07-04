@@ -282,14 +282,22 @@
                             url: "/user/reguser",
                             contentType: "application/json",
                             data: JSON.stringify(this.ruleForm),
-                            success: function (data) {
+                            success: function (data) {                                
+                                _self.notification.close();
+                                if (data.code == -1) {
+                                    return  _self.$notify({
+                                        title: '警告',
+                                        message: data.message,
+                                        type: 'warning'
+                                    });
+                                }
                                 if (data.code == 0 && data.data?.uuid) {
-                                    _self.notification.close();
+                                    
                                     _self.uuid = data.data.uuid;
                                     _self.getuserbymobile();
 
                                     return false;
-                                }
+                                }  
 
                             }
                         });
@@ -331,15 +339,26 @@
                     contentType: "application/json",
                     data:JSON.stringify(postData),
                     success: function (data) {
-                        _self.userInfo = data.data.userinfo;
-                        _self.userInfo.images = _self.userInfo.images.split(";")
-                        if (data.data.userinfo.webtitle) {
-                            _self.userInfo.website = data.data.userinfo.webtitle
+                        if (data.code==0) {
+                            _self.userInfo = data.data.userinfo;
+                            _self.userInfo.images = _self.userInfo.images.split(";")
+                            if (data.data.userinfo.webtitle) {
+                                _self.userInfo.website = data.data.userinfo.webtitle
+                            } else {
+                                _self.userInfo.website = data.data.userinfo.realname
+                            }
+                            _self.editVisible = false;
+                            _self.priviewVisible = ! this.editVisible
+                            return false;  
                         } else {
-                            _self.userInfo.website = data.data.userinfo.realname
+                            return  _self.$notify({
+                                title: '警告',
+                                message: data.message,
+                                type: 'warning'
+                            });
+                        
                         }
-                        _self.editVisible = false;
-                        _self.priviewVisible = ! this.editVisible
+                       
                     }
                 });
             },
