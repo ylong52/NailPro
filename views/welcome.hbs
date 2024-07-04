@@ -222,8 +222,8 @@
                 rules: {
                     webtitle:[
                         {
-                            pattern: /^[0-9a-zA-Z_-\u4e00-\u9fa5]+$/,
-                            message: '字符串只能包含中文、数字和英文字母',
+                             pattern: /^[0-9a-zA-Z\u4e00-\u9fa5-_]+$/,
+                            message: '字符串只能包含中文、数字、英文字母以及中划线和下划线',
                             trigger: ['blur', 'change']
                         }
                     ],
@@ -231,8 +231,8 @@
                         {required: true, message: '请输入姓名', trigger: ['blur', 'change', 'submit']},
                         {min: 1, max: 20, message: '长度在1 到20 个字', trigger: ['blur', 'change', 'submit']},
                         {
-                            pattern: /^[0-9a-zA-Z_-\u4e00-\u9fa5]+$/,
-                            message: '字符串只能包含中文、数字和英文字母',
+                             pattern: /^[0-9a-zA-Z\u4e00-\u9fa5-_]+$/,
+                            message: '字符串只能包含中文、数字、英文字母以及中划线和下划线',
                             trigger: ['blur', 'change']
                         }
                     ],
