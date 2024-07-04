@@ -64,8 +64,18 @@ exports.regUser = (req, res) => {
     strfiles = files.join(";")
     return new Promise((resolve, reject) => {
       if (userinfo.id==0) {
-        const uuid = generateUniqueCode();
-        const created_at = new Date().toLocaleString();
+        const uuid = generateUniqueCode()
+        const now = new Date();
+
+        const year = now.getFullYear();
+        const month = (now.getMonth() + 1).toString().padStart(2, '0'); // 月份是从0开始的
+        const day = now.getDate().toString().padStart(2, '0');
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        const created_at = `${year}-${month}-${day}${hours}:${minutes}:${seconds}`;
+
+
         try {
           let sqlStr = "INSERT INTO users (`webtitle`,`mobile_phone`,`realname`,`desc`,`images`,`weixing`,`xiaohongshu`,`uuid`,`created_at`) VALUES (?,?,?,?,?,?,?,?,?)";
           db.query(sqlStr, [userinfo.webtitle,userinfo.mobile_phone, userinfo.realname, userinfo.desc, strfiles,userinfo.weixing,userinfo.xiaohongshu, uuid, created_at], (err, results) => {
